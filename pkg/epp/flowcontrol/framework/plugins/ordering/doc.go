@@ -52,9 +52,16 @@ limitations under the License.
 //     (EnqueueTime + TTL).
 //     This maximizes the number of requests served before their deadlines expire.
 //
+<<<<<<< HEAD
 //   - Custom Data ("custom-data-ordering-policy"): Orders requests by user-defined custom data (numeric values only).
 //     This allows for custom ordering of requests based on a list of keys and their directions (ascending or descending).
 //     The custom data is provided as key-value pairs in the request metadata.
 //     The keys and directions are defined in the configuration of the plugin. A default value for a key can be used
 //     if no value is present in the request metadata for that key.
+=======
+//   - SLO Deadline ("slo-deadline-ordering-policy"): Orders requests by an SLO-based (service level objective) deadline
+//     computed as ReceivedTimestamp + x-slo-ttft-ms header (interpreted as milliseconds).
+//     Requests without a valid header are scheduled after SLO-bound requests.
+//     This maximizes the number of requests served before the deadlines computed on the defined SLO expire.
+>>>>>>> main
 package ordering

@@ -439,8 +439,7 @@ func setupDatastore(ctx context.Context, epFactory datalayer.EndpointFactory, mo
 			setupLog.Error(err, "Failed to construct endpoint pool from options")
 			return nil, err
 		}
-		endpointPoolOption := datastore.WithEndpointPool(endpointPool)
-		return datastore.NewDatastore(ctx, epFactory, modelServerMetricsPort, endpointPoolOption), nil
+		return datastore.NewDatastore(ctx, epFactory, modelServerMetricsPort).WithEndpointPool(endpointPool), nil
 	}
 }
 
@@ -460,7 +459,11 @@ func (r *Runner) registerInTreePlugins() {
 	fwkplugin.Register(fairness.RoundRobinFairnessPolicyType, fairness.RoundRobinFairnessPolicyFactory)
 	fwkplugin.Register(ordering.FCFSOrderingPolicyType, ordering.FCFSOrderingPolicyFactory)
 	fwkplugin.Register(ordering.EDFOrderingPolicyType, ordering.EDFOrderingPolicyFactory)
+<<<<<<< HEAD
 	fwkplugin.Register(ordering.CustomDataOrderingPolicyType, ordering.CustomDataOrderingPolicyFactory)
+=======
+	fwkplugin.Register(ordering.SLODeadlineOrderingPolicyType, ordering.SLODeadlineOrderingPolicyFactory)
+>>>>>>> main
 	// Latency predictor plugins
 	fwkplugin.Register(predictedlatency.PredictedLatencyPluginType, predictedlatency.PredictedLatencyFactory)
 	// register filter for test purpose only (used in conformance tests)
