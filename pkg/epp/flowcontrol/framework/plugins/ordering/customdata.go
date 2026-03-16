@@ -158,22 +158,17 @@ func (p *CustomDataOrderingPolicy) TypedName() plugin.TypedName {
 
 func (p *CustomDataOrderingPolicy) Less(a, b flowcontrol.QueueItemAccessor) bool {
 	for _, k := range p.keys {
+		var less, equal bool
 		switch k.defaultv.(type) {
 		case float64:
-			aVal := getMetaData(a.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], k.name, k.defaultv.(float64))
-			bVal := getMetaData(b.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], k.name, k.defaultv.(float64))
-			if aVal == bVal {
-				continue
-			}
-			return isLess(aVal, bVal, k.direction)
+			less, equal = isLessIsEqual(a, b, k.name, k.defaultv.(float64), k.direction)
 		case int:
-			aVal := getMetaData(a.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], k.name, k.defaultv.(int))
-			bVal := getMetaData(b.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], k.name, k.defaultv.(int))
-			if aVal == bVal {
-				continue
-			}
-			return isLess(aVal, bVal, k.direction)
+			less, equal = isLessIsEqual(a, b, k.name, k.defaultv.(int), k.direction)
 		}
+		if equal {
+			continue
+		}
+		return less
 	}
 	return false
 }
@@ -199,7 +194,15 @@ func getMetaData[T ~float64 | ~int](m any, key string, dv T) T {
 	}
 	return dv
 }
-
 func isLess[T ~float64 | ~int](a, b T, dir int) bool {
 	return a*T(dir) < b*T(dir)
+}
+
+func isLessIsEqual[T ~float64 | ~int](a, b flowcontrol.QueueItemAccessor, name string, defaultv T, dir int) (bool, bool) {
+	aVal := getMetaData(a.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], name, defaultv)
+	bVal := getMetaData(b.OriginalRequest().GetMetadata()[metadata.CustomOrderingNamespace], name, defaultv)
+	if aVal == bVal {
+		return false, true
+	}
+	return isLess(aVal, bVal, dir), false
 }
